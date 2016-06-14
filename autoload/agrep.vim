@@ -46,7 +46,7 @@ endfunction
 function! s:handle.stop()
 	if has_key(self, "job_id")
 " 		call job_stop(self.job_id)
-		call feedkeys(printf(":call job_stop(%d)\<CR>", self.job_id), "n")
+		call feedkeys(":AgrepStop\<CR>", "n")
 	endif
 endfunction
 
