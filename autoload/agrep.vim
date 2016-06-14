@@ -61,7 +61,7 @@ function! s:handle._update(...)
 			return
 		endif
 
-		cadde self.buffe
+		cadde self.buffer
 " 		call self.output.setline(self.output.line_length() + 1, self.buffer)
 		let self.buffer = []
 	catch
