@@ -26,7 +26,8 @@ let s:handle = {}
 function! s:handle.start(cmd) abort
 	call self.stop()
 	
-	let self.job_id = job_start([&shell, "-c", a:cmd], {
+	let c = (&shell == "command.com" || &shell == "cmd.exe" || &shell == "cmd") ? "/c" : "-c"
+	let self.job_id = job_start([&shell, c, a:cmd], {
 \		"out_cb" : self._output,
 \		"close_cb" : self._exit,
 \	})
