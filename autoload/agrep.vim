@@ -45,8 +45,7 @@ endfunction
 
 function! s:handle.stop()
 	if has_key(self, "job_id")
-" 		call job_stop(self.job_id)
-		call feedkeys(":AgrepStop\<CR>", "n")
+		call job_stop(self.job_id)
 	endif
 endfunction
 
@@ -82,7 +81,7 @@ function! s:handle._draw(...)
 		let icon = ["-", "\\", "|", "/"]
 		let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
 		
-" 		echo anime
+		echo anime
 " 		call self.output.setline(1, anime)
 	catch
 		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
