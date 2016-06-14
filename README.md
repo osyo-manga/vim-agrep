@@ -33,3 +33,14 @@ git clone https://github.com/osyo-manga/vim-agrep ~/.vim/bundle/vim-agrep
 Agrep {grep command option}
 ```
 
+
+## Setting
+
+```vim
+let g:agrep#config = {
+\	"command" : "grep",
+\	"option"  : "",
+\	"open_cmd" : "split"
+\}
+```
+

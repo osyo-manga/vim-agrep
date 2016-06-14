@@ -4,6 +4,7 @@ set cpo&vim
 
 
 " let s:B = vital#of("vital").import("Coaster.Buffer")
+let s:B = vital#agrep#of().import("Coaster.Buffer")
 
 function! s:error(msg)
 	echohl ErrorMsg
@@ -35,10 +36,12 @@ function! s:handle.start(cmd) abort
 	let self.update_timer_id = timer_start(1000, self._update, { "repeat" : -1 })
 	let self.draw_timer_id = timer_start(50, self._draw, { "repeat" : -1 })
 
-	cexpr []
-	copen
-" 	call self.output.open(self.config.open_cmd)
-" 	set filetype=agrep
+" 	cexpr []
+" 	copen
+
+	call self.output.open(self.config.open_cmd)
+
+	set filetype=agrep
 	execute "normal! \<C-w>p"
 endfunction
 
@@ -61,8 +64,9 @@ function! s:handle._update(...)
 			return
 		endif
 
-		cadde self.buffer
-" 		call self.output.setline(self.output.line_length() + 1, self.buffer)
+" 		cadde self.buffer
+		call self.output.setline(self.output.line_length() + 1, self.buffer)
+
 		let self.buffer = []
 	catch
 		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
@@ -81,8 +85,8 @@ function! s:handle._draw(...)
 		let icon = ["-", "\\", "|", "/"]
 		let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
 		
-		echo anime
-" 		call self.output.setline(1, anime)
+" 		echo anime
+		call self.output.setline(1, anime)
 	catch
 		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
 		call self.stop()
@@ -92,7 +96,7 @@ endfunction
 
 function! s:handle._init()
 	let self.count = 0
-" 	let self.output = s:B.new_temp()
+	let self.output = s:B.new_temp()
 	let self.buffer = []
 endfunction
 
@@ -101,7 +105,7 @@ function! s:handle._exit(...)
 	call self._update()
 
 " 	call s:set_qfline(0, { "text" : "Finished" })
-" 	call self.output.setline(1, "Finished.")
+	call self.output.setline(1, "Finished.")
 
 	if has_key(self, "update_timer_id")
 		call feedkeys(printf(":call timer_stop(%d)\<CR>", self.update_timer_id), "n")
