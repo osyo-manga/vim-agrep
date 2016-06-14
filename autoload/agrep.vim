@@ -56,28 +56,27 @@ endfunction
 
 
 function! s:handle._update(...)
-	if empty(self.buffer)
-		return
-	endif
-
 	try
-		cadde self.buffer
+		if empty(self.buffer)
+			return
+		endif
+
+		cadde self.buffe
 " 		call self.output.setline(self.output.line_length() + 1, self.buffer)
+		let self.buffer = []
 	catch
-		echom "Error agrep.vim : " . v:exception . " " . v:throwpoint
+		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
 		call self.stop()
 	endtry
-
-	let self.buffer = []
 endfunction
 
 
 function! s:handle._draw(...)
-	if has_key(self, "job_id") && job_status(self.job_id) == "dead"
-		return
-	endif
-
 	try
+		if has_key(self, "job_id") && job_status(self.job_id) == "dead"
+			return
+		endif
+
 		let self.count += 1
 		let icon = ["-", "\\", "|", "/"]
 		let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
@@ -85,7 +84,7 @@ function! s:handle._draw(...)
 		echo anime
 " 		call self.output.setline(1, anime)
 	catch
-		echom "Error agrep.vim : " . v:exception . " " . v:throwpoint
+		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
 		call self.stop()
 	endtry
 endfunction
