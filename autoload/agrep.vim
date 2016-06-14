@@ -5,6 +5,12 @@ set cpo&vim
 
 " let s:B = vital#of("vital").import("Coaster.Buffer")
 
+function! s:error(msg)
+	echohl ErrorMsg
+	echom "Error agrep.vim : " . a:msg
+	echohl NONE
+endfunction
+
 function! s:set_qfline(lnum, item)
 	let qflist = getqflist()
 	if len(qflist) <= a:lnum
@@ -137,6 +143,9 @@ endfunction
 
 function! agrep#start(args, ...)
 	let config = agrep#aget_config()
+	if !executable(config.command)
+		return s:error(printf("Not found '%s' command.", config.command))
+	endif
 	let cmd = config.command . " " . config.option . " " . a:args
 	let handle = s:start(cmd, config)
 " 	call handle.output.set_variable("agrep_handle", handle)
