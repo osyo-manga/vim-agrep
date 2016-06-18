@@ -34,8 +34,8 @@ function! s:handle.start(cmd) abort
 \		"close_cb" : self._exit,
 \	})
 
-	let self.update_timer_id = timer_start(1000, self._update, { "repeat" : -1 })
-	let self.draw_timer_id = timer_start(50, self._draw, { "repeat" : -1 })
+	let self.update_buffer_timer_id = timer_start(1000, self._update_buffer, { "repeat" : -1 })
+	let self.update_anime_timer_id = timer_start(50, self._update_anime, { "repeat" : -1 })
 
 " 	cexpr []
 " 	copen
@@ -50,6 +50,7 @@ endfunction
 function! s:handle.stop()
 	if has_key(self, "job_id")
 		call job_stop(self.job_id)
+		unlet self.job_id
 	endif
 endfunction
 
@@ -59,7 +60,7 @@ function! s:handle._output(channel, msg)
 endfunction
 
 
-function! s:handle._update(...)
+function! s:handle._update_buffer(...)
 	try
 		if empty(self.buffer)
 			return
@@ -76,12 +77,8 @@ function! s:handle._update(...)
 endfunction
 
 
-function! s:handle._draw(...)
+function! s:handle._update_anime(...)
 	try
-		if has_key(self, "job_id") && job_status(self.job_id) == "dead"
-			return
-		endif
-
 		let self.count += 1
 		let icon = ["-", "\\", "|", "/"]
 		let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
@@ -103,19 +100,19 @@ endfunction
 
 
 function! s:handle._exit(...)
-	call self._update()
+	call self._update_buffer()
 
 " 	call s:set_qfline(0, { "text" : "Finished" })
 	call self.output.setline(1, "Finished.")
 
-	if has_key(self, "update_timer_id")
-		call feedkeys(printf(":call timer_stop(%d)\<CR>", self.update_timer_id), "n")
-		unlet self.update_timer_id
+	if has_key(self, "update_buffer_timer_id")
+		call timer_stop(self.update_buffer_timer_id)
+		unlet self.update_buffer_timer_id
 	endif
 
-	if has_key(self, "draw_timer_id")
-		call feedkeys(printf(":call timer_stop(%d)\<CR>", self.draw_timer_id), "n")
-		unlet self.draw_timer_id
+	if has_key(self, "update_anime_timer_id")
+		call timer_stop(self.update_anime_timer_id)
+		unlet self.update_anime_timer_id
 	endif
 endfunction
 
