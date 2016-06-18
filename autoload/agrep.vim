@@ -30,6 +30,7 @@ function! s:handle.start(cmd) abort
 	let c = (&shell =~ 'command.com$' || &shell =~ 'cmd.exe$' || &shell =~ 'cmd$') ? "/c" : "-c"
 	let self.job_id = job_start([&shell, c, a:cmd], {
 \		"out_cb" : self._output,
+\		"err_cb" : self._output,
 \		"close_cb" : self._exit,
 \	})
 
