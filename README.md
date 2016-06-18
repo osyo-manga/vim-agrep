@@ -4,6 +4,7 @@
 
 Async grep.
 
+![agrep](https://cloud.githubusercontent.com/assets/214488/16170862/86d4a73a-359b-11e6-93d8-1cf6f8858eb1.gif)
 
 ## Requirement
 
