@@ -3,8 +3,13 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
-" let s:B = vital#of("vital").import("Coaster.Buffer")
-let s:B = vital#agrep#of().import("Coaster.Buffer")
+" call vital#of("vital").unload()
+" let s:v = vital#of("vital")
+let s:V = vital#agrep#of()
+
+let s:B = s:V.import("Coaster.Buffer")
+let s:T = s:V.import("Branc.Timer")
+" let s:T = vital#of("vital").import("Branc.Timer")
 
 function! s:error(msg)
 	echohl ErrorMsg
@@ -34,8 +39,38 @@ function! s:handle.start(cmd) abort
 \		"close_cb" : self._exit,
 \	})
 
-	let self.update_buffer_timer_id = timer_start(1000, self._update_buffer, { "repeat" : -1 })
-	let self.update_anime_timer_id = timer_start(50, self._update_anime, { "repeat" : -1 })
+	let update = s:T.new({
+\		"handle_" : self
+\	}).start(1000, { "repeat" : -1 })
+
+	function! update._callback(...)
+		let buffer = self.handle_.buffer
+		if empty(buffer)
+			return
+		endif
+		let lnum = self.handle_.output.line_length() + 1
+		call self.handle_.output.setline(lnum, buffer)
+
+		if job_status(self.handle_.job_id) == "dead"
+			return self.stop()
+		endif
+	endfunction
+
+	let anime = s:T.new({
+\		"count_"  : 0,
+\		"job_"    : self.job_id,
+\		"output_" : self.output
+\	}).start(50, { "repeat"  : -1})
+
+	function! anime._callback(...)
+		if job_status(self.job_) == "dead"
+			return self.stop()
+		endif
+		let self.count_ += 1
+		let icon = ["-", "\\", "|", "/"]
+		let anime =  icon[self.count_ % len(icon)] . " Searching" . repeat(".", self.count_ % 5)
+		call self.output_.setline(1, anime)
+	endfunction
 
 " 	cexpr []
 " 	copen
@@ -60,38 +95,6 @@ function! s:handle._output(channel, msg)
 endfunction
 
 
-function! s:handle._update_buffer(...)
-	try
-		if empty(self.buffer)
-			return
-		endif
-
-" 		cadde self.buffer
-		call self.output.setline(self.output.line_length() + 1, self.buffer)
-
-		let self.buffer = []
-	catch
-		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
-		call self.stop()
-	endtry
-endfunction
-
-
-function! s:handle._update_anime(...)
-	try
-		let self.count += 1
-		let icon = ["-", "\\", "|", "/"]
-		let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
-		
-" 		echo anime
-		call self.output.setline(1, anime)
-	catch
-		call s:error("Error agrep.vim : " . v:exception . " " . v:throwpoint)
-		call self.stop()
-	endtry
-endfunction
-
-
 function! s:handle._init()
 	let self.count = 0
 	let self.output = s:B.new_temp()
@@ -100,8 +103,6 @@ endfunction
 
 
 function! s:handle._exit(...)
-	call self._update_buffer()
-
 " 	call s:set_qfline(0, { "text" : "Finished" })
 	call self.output.setline(1, "Finished.")
 
@@ -142,13 +143,13 @@ let s:default_config = {
 let g:agrep#config = get(g:, "agrep#config", {})
 
 
-function! agrep#aget_config(...)
+function! agrep#get_config(...)
 	return extend(extend(deepcopy(s:default_config), g:agrep#config), get(a:, 1, {}))
 endfunction
 
 
 function! agrep#start(args, ...)
-	let config = agrep#aget_config()
+	let config = agrep#get_config()
 	if !executable(config.command)
 		return s:error(printf("Not found '%s' command.", config.command))
 	endif
