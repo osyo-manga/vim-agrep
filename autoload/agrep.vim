@@ -11,7 +11,6 @@ let s:B = s:V.import("Coaster.Buffer")
 let s:T = s:V.import("Branc.Timer")
 let s:J = s:V.import("Branc.Job")
 
-" let s:T = vital#of("vital").import("Branc.Timer")
 
 function! s:error(msg)
 	echohl ErrorMsg
@@ -146,7 +145,6 @@ function! agrep#start(args, ...)
 		let handle = s:new(config)
 	endif
 	call handle.start(cmd)
-" 	let handle = s:start(cmd, config)
 
 " 	call handle.output.set_variable("agrep_handle", handle)
 
