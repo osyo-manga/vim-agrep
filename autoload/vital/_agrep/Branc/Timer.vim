@@ -73,10 +73,10 @@ function! s:timer.start(time, ...)
 		let self.__id = timer_start(a:time, self.__callback, a:1)
 	elseif a:0 == 1 && type(a:1) == type()
 		let self.__id = timer_start(a:time, self.__callback)
-		let self._callback = a:1
+		let self._callback = function(a:1, [], get(a:1, "dict"))
 	elseif a:0 == 2
 		let self.__id = timer_start(a:time, self.__callback, a:2)
-		let self._callback = a:1
+		let self._callback = function(a:1, [], get(a:1, "dict"))
 	endif
 	return self
 endfunction

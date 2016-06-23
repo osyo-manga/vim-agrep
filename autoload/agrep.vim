@@ -3,9 +3,9 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
+let s:V = vital#agrep#of()
 " call vital#of("vital").unload()
 " let s:V = vital#of("vital")
-let s:V = vital#agrep#of()
 
 let s:B = s:V.import("Coaster.Buffer")
 let s:T = s:V.import("Branc.Timer")
