@@ -66,10 +66,17 @@ endfunction
 
 function! s:timer.start(time, ...)
 	call self.stop()
+
 	if a:0 == 0
 		let self.__id = timer_start(a:time, self.__callback)
-	else
+	elseif a:0 == 1 && type(a:1) == type({})
 		let self.__id = timer_start(a:time, self.__callback, a:1)
+	elseif a:0 == 1 && type(a:1) == type()
+		let self.__id = timer_start(a:time, self.__callback)
+		let self._callback = a:1
+	elseif a:0 == 2
+		let self.__id = timer_start(a:time, self.__callback, a:2)
+		let self._callback = a:1
 	endif
 	return self
 endfunction
@@ -80,7 +87,7 @@ function! s:stop_all()
 	for timer in s:timers
 		call timer.stop()
 	endfor
-	call s:timers = []
+	let s:timers = []
 endfunction
 
 
