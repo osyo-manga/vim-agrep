@@ -4,8 +4,8 @@ set cpo&vim
 
 
 let s:V = vital#agrep#of()
-" call vital#of("vital").unload()
-" let s:V = vital#of("vital")
+call vital#of("vital").unload()
+let s:V = vital#of("vital")
 
 let s:B = s:V.import("Coaster.Buffer")
 let s:T = s:V.import("Branc.Timer")
@@ -17,6 +17,17 @@ function! s:error(msg)
 	echom "Error agrep.vim : " . a:msg
 	echohl NONE
 endfunction
+
+
+let s:anime = { "count" : 0 }
+function! s:anime.update(outputter, ...)
+	let self.count += 1
+	let icon = ["-", "\\", "|", "/"]
+	let anime =  icon[self.count % len(icon)] . " Searching" . repeat(".", self.count % 5)
+	call a:outputter(anime)
+endfunction
+
+
 
 function! s:set_qfline(lnum, item)
 	let qflist = getqflist()
@@ -34,9 +45,11 @@ function! s:handle.start(cmd) abort
 	call self.stop()
 	
 	let c = (&shell =~ 'command.com$' || &shell =~ 'cmd.exe$' || &shell =~ 'cmd$') ? "/c" : "-c"
-	let self.job = s:J.start([&shell, c, a:cmd])
 
-	let self.job.buffer_ = []
+	let self.job = s:J.new({
+\		"buffer_" : []
+\	}).start([&shell, c, a:cmd])
+
 	function! self.job._callback(channel, msg)
 		let self.buffer_ += [a:msg]
 	endfunction
@@ -45,17 +58,8 @@ function! s:handle.start(cmd) abort
 
 	let self.update_timer = s:T.start(1000, self._update, { "repeat" : -1 })
 
-	let self.anime_timer = s:T.new({
-\		"count_"  : 0,
-\		"output_" : self.output
-\	}).start(50, { "repeat"  : -1})
-
-	function! self.anime_timer._callback(...)
-		let self.count_ += 1
-		let icon = ["-", "\\", "|", "/"]
-		let anime =  icon[self.count_ % len(icon)] . " Searching" . repeat(".", self.count_ % 5)
-		call self.output_.setline(1, anime)
-	endfunction
+	let Outputter = function(self.output.setline, [1])
+	let self.anime_timer = s:T.start(50, function(s:anime.update, [Outputter]), { "repeat" : -1 })
 
 " 	cexpr []
 " 	copen
