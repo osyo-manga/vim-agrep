@@ -107,6 +107,7 @@ endfunction
 
 function! s:new(...)
 	let job = deepcopy(s:job)
+	call extend(job, get(a:, 1, {}))
 	return job
 endfunction
 
