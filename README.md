@@ -11,6 +11,7 @@ Async grep.
 * grep command
 * `+timers`
 * `+job`
+* Vim version 7.4.1842 or above
 
 ## Installation
 
